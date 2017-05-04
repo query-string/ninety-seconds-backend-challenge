@@ -17,10 +17,11 @@ ActiveRecord::Schema.define(version: 20170504070631) do
   enable_extension "pgcrypto"
 
   create_table "artists", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.integer "spotify_id"
+    t.string "spotify_id", null: false
     t.jsonb "payload"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["spotify_id"], name: "index_artists_on_spotify_id"
   end
 
 end

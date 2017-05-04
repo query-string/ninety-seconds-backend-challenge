@@ -6,7 +6,7 @@ class V1::SearchController < ApplicationController
     if has_query?
       fetch_artists
     else
-      render json: { message: "Search query string `?q=` expected" },
+      render json: { error: { status: 412, message: "Search query string `?q=` expected" }},
         status: :expectation_failed
     end
   end

@@ -1,13 +1,13 @@
 require "rails_helper"
-REQUEST_URL = "/v1/search"
 
 describe "Search API endpoints", type: :request do
+  let(:request_url) { v1_search_index_path }
 
   describe "GET index" do
     let(:json_body) { JSON.parse(response.body) }
 
     context "no query params defined" do
-      before { get REQUEST_URL, params: { format: :json } }
+      before { get request_url, params: { format: :json } }
 
       it "responds with error header" do
         expect(response).not_to be_success
@@ -16,13 +16,15 @@ describe "Search API endpoints", type: :request do
         expect(response.code).to eq("417")
       end
       it "responds with JSON error message" do
-        expect(json_body["message"]).to eq("Search query string `?q=` expected")
+        expect(json_body["error"].present?).to eq(true)
+        expect(json_body["error"]["status"]).to eq(412)
+        expect(json_body["error"]["message"]).to eq("Search query string `?q=` expected")
       end
     end
 
     context "query param defined" do
       context "artists to be found" do
-        before { get REQUEST_URL, params: { q: "2pac", format: :json } }
+        before { get request_url, params: { q: "2pac", format: :json } }
 
         it "responds with success header" do
           expect(response).to be_success
@@ -39,7 +41,7 @@ describe "Search API endpoints", type: :request do
       end
 
       context "artists not to be found" do
-        before { get REQUEST_URL, params: { q: "lolwut", format: :json } }
+        before { get request_url, params: { q: "lolwut", format: :json } }
 
         it "responds with success header" do
           expect(response).to be_success
