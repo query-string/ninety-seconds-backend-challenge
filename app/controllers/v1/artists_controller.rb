@@ -1,6 +1,4 @@
 class V1::ArtistsController < ApplicationController
-  require "httparty"
-  API_URL = "https://api.spotify.com/v1/artists/"
 
   def show
     artists = Artist.by_spotify_id(params[:id])
@@ -9,27 +7,29 @@ class V1::ArtistsController < ApplicationController
       # @TODO: Keep artists payload updated
       respond_with_artist artists.first.payload
     else
-      response = client
-      unless response["error"]
-        artist = ArtistDecorator.new(response).decorate
-        respond_with_artist artist
-        Artist.create(spotify_id: artist["id"], payload: artist)
+      payload = spotify.artist(params[:id])
+
+      if payload["error"]
+        render json: { error: error_message}, status: :not_found
       else
-        render json: { error: { status: 404, message: "Sorry, an artist with defined ID doesn't exist" }},
-          status: :not_found
+        create_artist(payload)
       end
     end
   end
 
   private
 
-  def client
-    response = HTTParty.get("#{API_URL}#{params[:id]}")
-    response.parsed_response
+  def create_artist(payload)
+    artist = ArtistDecorator.new(payload).decorate
+    respond_with_artist artist
+    Artist.create(spotify_id: artist["id"], payload: artist)
   end
 
   def respond_with_artist(artist)
-    render json: artist,
-      status: :ok
+    render json: artist, status: :ok
+  end
+
+  def error_message
+    { status: 404, message: "Sorry, an artist with defined ID doesn't exist" }
   end
 end
