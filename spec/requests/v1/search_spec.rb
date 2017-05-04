@@ -33,6 +33,9 @@ describe "Search API endpoints", type: :request do
         it "responds a list of artists" do
           expect(json_body["artists"].any?).to be(true)
         end
+        it "result formated with the spotify id, external_urls, genres, href and name" do
+          expect(json_body["artists"].map(&:keys).flatten.uniq).to match_array(%w(id external_urls genres href name))
+        end
       end
 
       context "artists not to be found" do

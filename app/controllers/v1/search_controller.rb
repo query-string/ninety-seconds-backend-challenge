@@ -21,7 +21,7 @@ class V1::SearchController < ApplicationController
     artists = client["artists"]["items"]
 
     if artists && artists.any?
-      render json: { artists: artists },
+      render json: { artists: artists.map { |a| ArtistDecorator.new(a).decorate } },
         status: :ok
     else
       render json: { artists: [] },
