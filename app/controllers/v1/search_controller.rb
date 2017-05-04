@@ -1,11 +1,13 @@
 class V1::SearchController < ApplicationController
-  URL_ORIGIN = "https://api.spotify.com/v1/search?type=artist&limit=#{ENV["ARTISTS_PER_PAGE" || 50]}&q="
+  require "httparty"
+  API_URL = "https://api.spotify.com/v1/search?type=artist&limit=#{ENV["ARTISTS_PER_PAGE" || 50]}&q="
 
   def index
     if has_query?
-      head :ok
+      fetch_artists
     else
-      render json: { message: "Search query string `?q=` expected" }, status: :expectation_failed
+      render json: { message: "Search query string `?q=` expected" },
+        status: :expectation_failed
     end
   end
 
@@ -13,5 +15,22 @@ class V1::SearchController < ApplicationController
 
   def has_query?
     params.include?(:q)
+  end
+
+  def fetch_artists
+    artists = client["artists"]["items"]
+
+    if artists && artists.any?
+      render json: { artists: artists },
+        status: :ok
+    else
+      render json: { artists: [] },
+        status: :partial_content
+    end
+  end
+
+  def client
+    response = HTTParty.get("#{API_URL}#{params[:q]}")
+    response.parsed_response
   end
 end
