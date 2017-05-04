@@ -31,5 +31,9 @@ module NinetySecondsBackendChallenge
     config.api_only = true
 
     config.autoload_paths << "#{Rails.root}/lib/decorators"
+
+    config.generators do |g|
+      g.orm :active_record, primary_key_type: :uuid
+    end
   end
 end
