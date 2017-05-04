@@ -6,7 +6,7 @@ describe "Artists API endpoints", type: :request do
   describe "GET artist" do
     let(:json_body) { JSON.parse(response.body) }
 
-    context "artist to be found" do
+    context "artist to be created" do
       before { get "#{request_url}/3iCJOi5YKh247eutgCyLFe", params: { format: :json } }
 
       it "responds with success header" do
@@ -23,6 +23,22 @@ describe "Artists API endpoints", type: :request do
       end
       it "has expected genres" do
         expect(json_body["genres"]).to match_array(["emo","metalcore","nintendocore","pixie","pop punk","post-screamo","screamo"])
+      end
+      it "create artist record" do
+        expect(Artist.count).to eq(1)
+        expect(Artist.first.spotify_id).to eq("3iCJOi5YKh247eutgCyLFe")
+      end
+    end
+
+    context "artist to be found" do
+      before { Rails.application.load_seed }
+
+      it "fetches artist from DB" do
+        expect {
+          get "#{request_url}/4P0dddbxPil35MNN9G2MEX", params: { format: :json }
+        }.not_to change{
+          Artist.count
+        }
       end
     end
 

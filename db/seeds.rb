@@ -1,7 +1,10 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
-#   Character.create(name: 'Luke', movie: movies.first)
+Artist.create(
+  spotify_id: "4P0dddbxPil35MNN9G2MEX",
+  payload: {
+    "id" => "4P0dddbxPil35MNN9G2MEX",
+    "href" => "https://api.spotify.com/v1/artists/4P0dddbxPil35MNN9G2MEX",
+    "name" => "Cypress Hill",
+    "genres" => ["gangster rap", "hardcore hip hop", "hip hop", "rap", "rap rock", "west coast rap"],
+    "external_urls" => {"spotify"=>"https://open.spotify.com/artist/4P0dddbxPil35MNN9G2MEX"}
+  }
+)
