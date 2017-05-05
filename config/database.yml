@@ -22,4 +22,4 @@ test:
 
 production:
   <<: *default
-  database: 90-seconds_production
+  url: <%= ENV['DATABASE_URL'] %>
