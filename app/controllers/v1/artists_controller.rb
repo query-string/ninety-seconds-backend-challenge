@@ -1,35 +1,27 @@
 class V1::ArtistsController < ApplicationController
-
   def show
-    artists = Artist.by_spotify_id(params[:id])
+    with_artist do |artist|
+      render json: artist.model.payload, status: :ok
+    end
+  end
 
-    if artists.any?
-      # @TODO: Keep artists payload updated
-      respond_with_artist artists.first.payload
-    else
-      payload = spotify.artist(params[:id])
-
-      if payload["error"]
-        render json: { error: error_message}, status: :not_found
-      else
-        create_artist(payload)
-      end
+  def update
+    with_artist do |artist|
+      artist.model.update(is_favourite: !artist.model.is_favourite)
+      render json: { favourite: artist.model.is_favourite, artist: artist.model.payload }, status: :ok
     end
   end
 
   private
 
-  def create_artist(payload)
-    artist = ArtistDecorator.new(payload).decorate
-    respond_with_artist artist
-    Artist.create(spotify_id: artist["id"], payload: artist)
-  end
+  def with_artist
+    artist = ArtistMatcherService.new(params[:id])
+    artist.fetch
 
-  def respond_with_artist(artist)
-    render json: artist, status: :ok
-  end
-
-  def error_message
-    { status: 404, message: "Sorry, an artist with defined ID doesn't exist" }
+    if artist.error
+      render json: artist.error, status: :not_found
+    else
+      yield(artist)
+    end
   end
 end

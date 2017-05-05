@@ -6,5 +6,6 @@ Artist.create(
     "name" => "Cypress Hill",
     "genres" => ["gangster rap", "hardcore hip hop", "hip hop", "rap", "rap rock", "west coast rap"],
     "external_urls" => {"spotify"=>"https://open.spotify.com/artist/4P0dddbxPil35MNN9G2MEX"}
-  }
+  },
+  is_favourite: false
 )

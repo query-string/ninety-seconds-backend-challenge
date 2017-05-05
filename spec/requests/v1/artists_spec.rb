@@ -6,7 +6,7 @@ describe "Artists API endpoints", type: :request do
   describe "GET artist" do
     let(:json_body) { JSON.parse(response.body) }
 
-    context "artist to be created" do
+    context "inexistent artist to be created" do
       before { get "#{request_url}/3iCJOi5YKh247eutgCyLFe", params: { format: :json } }
 
       it "responds with success header" do
@@ -30,7 +30,7 @@ describe "Artists API endpoints", type: :request do
       end
     end
 
-    context "artist to be found" do
+    context "existent artist to be found" do
       before { Rails.application.load_seed }
 
       it "fetches artist from DB" do
@@ -56,6 +56,45 @@ describe "Artists API endpoints", type: :request do
         expect(json_body["error"]["status"]).to eq(404)
         expect(json_body["error"]["message"]).to eq("Sorry, an artist with defined ID doesn't exist")
       end
+    end
+  end
+
+  describe "PUT artist to favourites" do
+    let(:json_body) { JSON.parse(response.body) }
+    before { Rails.application.load_seed }
+
+    it "adds to favourites" do
+      expect {
+        put "#{request_url}/4P0dddbxPil35MNN9G2MEX", params: { format: :json }
+      }.to change {
+        Artist.with_spotify_id("4P0dddbxPil35MNN9G2MEX").first.is_favourite
+      }.from(false).to(true)
+    end
+
+    it "removes from favourites" do
+      Artist.with_spotify_id("4P0dddbxPil35MNN9G2MEX").first.update(is_favourite: true)
+      expect {
+        put "#{request_url}/4P0dddbxPil35MNN9G2MEX", params: { format: :json }
+      }.to change {
+        Artist.with_spotify_id("4P0dddbxPil35MNN9G2MEX").first.is_favourite
+      }.from(true).to(false)
+    end
+
+    it "creates and adds to favourites" do
+      expect {
+        put "#{request_url}/3iCJOi5YKh247eutgCyLFe", params: { format: :json }
+      }.to change {
+        Artist.count
+      }.from(1).to(2)
+    end
+
+    it "returns an error if artist doesn't exist" do
+      expect {
+        put "#{request_url}/a1b2e34r5t", params: { format: :json }
+      }.not_to change {
+        Artist.count
+      }
+      expect(response.code).to eq("404")
     end
   end
 end
