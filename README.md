@@ -19,3 +19,10 @@
 [PUT] https://ninety-seconds-backend.herokuapp.com/v1/artists/3iCJOi5YKh247eutgCyLFe
 [PUT] https://ninety-seconds-backend.herokuapp.com/v1/artists/a1b2e34r5t
 ```
+
+# SETUP APP LOCALLY
+
+```
+cp .env.example .env
+bundle exec rake db:setup
+```
